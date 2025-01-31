@@ -21,11 +21,14 @@ while True:
     def request():
         load_dotenv()
         API_TOKEN = os.getenv("API_TOKEN")
-
+        API_URL = os.getenv("API_URL")
+        API_TICKET_URL = os.getenv("API_TICKET_URL")
+ 
         id = input("\nID do cliente: ")  
         ticket_id = input("ID do chamado: ")
-        api = f"https://api.tomticket.com/v2.0/customer/details?customer_id={id}" 
-        apiticket = f"https://api.tomticket.com/v2.0/ticket/detail?ticket_id={ticket_id}"
+
+        api = f"{API_URL}{id}" 
+        apiticket = f"{API_TICKET_URL}{ticket_id}"
 
         headers = {'Authorization': f'Bearer {API_TOKEN}'}
 
@@ -186,20 +189,35 @@ while True:
             linha_atual += 1
 
         wb.save(arquivo_excel)
-        print(f"\nPlanilha '{arquivo_excel}' gerada e salva lá em downloads!")
+        print(f"\nPlanilha salva em: {arquivo_excel}")
+
+
+    caminho_base = "G:\\Drives compartilhados\\FICHAS DE IMPLANTACAO"
+
+    primeira_letra = dados_filtrados["Razão Social"][0].upper()
+    subpasta_letra = os.path.join(caminho_base, primeira_letra)
+
+
+    tipo_mensagem_letra = "já existia" if os.path.exists(subpasta_letra) else "foi criada"
+    os.makedirs(subpasta_letra, exist_ok=True)
+    print(f"\nPasta da letra '{primeira_letra}'{tipo_mensagem_letra}: {subpasta_letra}")
+
+
+    pasta_razao_social = os.path.join(subpasta_letra, dados_filtrados["Razão Social"])
+    tipo_mensagem_razao = "já existia" if os.path.exists(pasta_razao_social) else "foi criada"
+    os.makedirs(pasta_razao_social, exist_ok=True)
+    print(f"Pasta da Razão Social '{dados_filtrados['Razão Social']}' {tipo_mensagem_razao}: {pasta_razao_social}")
 
     
-    downloads_folder = str(Path(os.path.expanduser("~")) / "Downloads")
-    arquivo_excel = os.path.join(downloads_folder, f"{dados_filtrados["Loja"]}.xlsx")
+    arquivo_excel = os.path.join(pasta_razao_social, f"{dados_filtrados['Loja']}.xlsx")
 
+    
     url_imagem = "https://i.postimg.cc/CMXH4QSk/payer.png"
     resposta = requests.get(url_imagem)
-
     caminho_imagem = 'payer.png'
     with open(caminho_imagem, 'wb') as f:
         f.write(resposta.content)
 
-    #Executa a função de criação da planilha. 
     gerar_planilha_estilizada(dados_filtrados_reorganizado, arquivo_excel, caminho_imagem)
 
     time.sleep(3)

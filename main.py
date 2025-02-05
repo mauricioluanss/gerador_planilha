@@ -63,7 +63,7 @@ while True:
     dados_filtrados = {}
     try:
         dados_filtrados['Chamado'] = dicionario['resposta_ticket']['data']['protocol']
-        dados_filtrados['Razão Social'] = dicionario['resposta']['data'][0]['name']
+        dados_filtrados['Razão Social'] = dicionario['resposta']['data'][0]['name'].strip()
         nome_fantasia = dicionario['resposta']['data'][0]['custom_fields'][0]['value']
 
         conta_empresa_loja = dicionario['resposta']['data'][0]['internal_id']
@@ -155,8 +155,8 @@ while True:
         ws["A1"].border = borda_fina
 
         img = Image(caminho_imagem)
-        img.width = 80  
-        img.height = 17  
+        img.width = 120  
+        img.height = 19  
         ws.add_image(img, 'A1') 
 
         ws["B1"].value = "FICHA DE IMPLANTAÇÃO"
@@ -197,7 +197,7 @@ while True:
         print(f"\nPlanilha salva em: {arquivo_excel}")
 
     #aqui é como eu salvo a planilha. Primeiro eu defini o caminho raiz, que é a pasta compartilhada que a empresa usa no drive pra salvar as fichas. Aí dentro tem pastas de a até z, e dentro de cada uma delas tem pastas nomeadas com as razões sociais dos clientes. Meu código vai verificar no caminho raiz se existe pasta com a letra inicial da razão social do cliente que estamos gerando a ficha, se houver, ele entra na pasta, se nao, ele cria ela e continua. Depois ele verifica se existe a pasta com o nome da razão social do cliente, se houver, ele entra, se não, ele cria. Por fim ele cria a planilha dentro dessa pasta.
-    caminho_base = "G:\\Drives compartilhados\\FICHAS DE IMPLANTACAO"
+    caminho_base = f"G:\\Drives compartilhados\\FICHAS DE IMPLANTACAO"
 
     primeira_letra = dados_filtrados["Razão Social"][0].upper()
     subpasta_letra = os.path.join(caminho_base, primeira_letra)

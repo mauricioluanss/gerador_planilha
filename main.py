@@ -16,7 +16,10 @@ print("##############################################\n")
 
 #Esse laço while é para que o programa continue rodando até que o usuário decida encerrar
 while True:
-    #essa função vai pedir ao usuario  duas informações: o id do cliente e o id do chamado. Com essas informações, o programa vai realizar as requisições na api do tomticket através de dois endpoints específicos. (Consta na documentação da api do tomticket). Os endpoints e o token de acesso estão salvos no arquivo.env. Esse arquivo eu nao vou subir para o github pois são privados.
+    #essa função vai pedir ao usuario  duas informações: o id do cliente e o id do chamado. Com essas informações,
+    #o programa vai realizar as requisições na api do tomticket através de dois endpoints específicos. (Consta na 
+    #documentação da api do tomticket). Os endpoints e o token de acesso estão salvos no arquivo.env. Esse arquivo
+    #eu nao vou subir para o github pois são privados.
     def request():
         load_dotenv()
         API_TOKEN = os.getenv("API_TOKEN")
@@ -38,7 +41,10 @@ while True:
     resposta, resposta_ticket = request()
 
 
-    #esse bloco cria um dicionario chamado arquivo, depois entra num laço que verifica o retorno das requisições. Se der tudo certo ele cria um json para cada uma e armazena no dicionario, noemando uma chave para cada json. Se o retorno for qualquer coisa diferente de 200 (ok), entra no else, joga a mensagem de retorno na tela e chama a funcao request() novamente.
+    #esse bloco cria um dicionario chamado arquivo, depois entra num laço que verifica o retorno das requisições.
+    #Se der tudo certo ele cria um json para cada uma e armazena no dicionario, noemando uma chave para cada json.
+    #Se o retorno for qualquer coisa diferente de 200 (ok), entra no else, joga a mensagem de retorno na tela e chama
+    #a funcao request() novamente.
     arquivo = {}
     while True:
         if resposta.status_code == 200 and resposta_ticket.status_code == 200:
@@ -51,7 +57,10 @@ while True:
             resposta, resposta_ticket = request()
 
 
-    #esse primeiro bloco vai pegar os dois json que estão dentro do dicionario 'arquivo' vai criar um arquivo chamado 'arquivo.json' e jogar o conteudo de cada json dentro dele. Aí ele cria a variavel file e joga o arquivo.json pra dentro de dela. Na liinha de baixo o arquivo.json é lido e jogado dentro de um dicionario chamado dicionario. Isso é feito pra poder acessar as chaves do json de forma mais fácil em um unico lugar.
+    #esse primeiro bloco vai pegar os dois json que estão dentro do dicionario 'arquivo' vai criar um arquivo chamado
+    #'arquivo.json' e jogar o conteudo de cada json dentro dele. Aí ele cria a variavel file e joga o arquivo.json pra
+    #dentro de dela. Na liinha de baixo o arquivo.json é lido e jogado dentro de um dicionario chamado dicionario. Isso
+    #é feito pra poder acessar as chaves do json de forma mais fácil em um unico lugar.
     with open('arquivo.json', 'w', encoding='utf-8') as file:
         json.dump(arquivo, file, ensure_ascii=False, indent=4)
 
@@ -59,7 +68,10 @@ while True:
         dicionario = json.load(file)
 
     
-    #aqui eu crio um dicionario vazio chamado dados_filtrados. Embaixo eu crio chaves dentro desse dicionario nomeadas com os campos que vou precisar colocar na planilha depois. Em cada linha eu tento acessar os valores das chaves que foram armazenados em 'dicionario'. Por ex: 'Chamado' vai receber o valor da chave 'protocol' que está dentro de 'data', que está dentro de 'resposta_ticket' que está dentro de 'dicionario'.
+    #aqui eu crio um dicionario vazio chamado dados_filtrados. Embaixo eu crio chaves dentro desse dicionario nomeadas
+    #com os campos que vou precisar colocar na planilha depois. Em cada linha eu tento acessar os valores das chaves que
+    #foram armazenados em 'dicionario'. Por ex: 'Chamado' vai receber o valor da chave 'protocol' que está dentro de 'data',
+    #que está dentro de 'resposta_ticket' que está dentro de 'dicionario'.
     dados_filtrados = {}
     try:
         dados_filtrados['Chamado'] = dicionario['resposta_ticket']['data']['protocol']
@@ -77,14 +89,18 @@ while True:
         padrao = r"Terminais \[(\d+)\]" #Isso aqui só descobri catando na internet. É muito específico...
         resultado = re.search(padrao, dados_filtrados['pdv'])
 
-        #essa parte foi gambiarra pra eu concatenar os valores de empresa, loja e a quantidade de terminais que o cliente tem. Não consegui fazer sozinho e corri para o chatgpt kkkkkkkk.
+        #essa parte foi gambiarra pra eu concatenar os valores de empresa, loja e a quantidade de terminais que o cliente tem.
+        #Não consegui fazer sozinho e corri para o chatgpt kkkkkkkk.
         if resultado:
             numero_terminais = int(resultado.group(1))
             partes = conta_empresa_loja.split('-')
             conta_editada = partes[1] + partes[2]
             sequencias = [f"{conta_editada}{i:02}" for i in range(1, numero_terminais + 1)]
 
-        #esses dados são os que estão dentro de 'custom_fields' que é um array de objetos. Eu criei uma lista chamada 'dados_a_capturar' com os campos que eu quero pegar. Depois eu crio um laço que vai percorrer cada item do array e verificar se o nome do campo é igual a algum campo da lista 'dados_a_capturar'. Se for igual, ele vai pegar o valor do campo e armazenar no dicionario 'dados_filtrados'.
+        #esses dados são os que estão dentro de 'custom_fields' que é um array de objetos. Eu criei uma lista chamada
+        #'dados_a_capturar'        com os camposs que eu quero pegar. Depois eu crio um laço que vai percorrer cada item
+        #do arraye verificar se o nome do campo é igual a algum campo da lista 'dados_a_capturar'. Se for igual, ele vai
+        #pegar o valor do campo e armazenar no dicionario 'dados_filtrados'.
         captura = dicionario['resposta']['data'][0]['custom_fields']
         dados_a_capturar = [
             "Nome Fantasia","CNPJ","Endereco","Numero","Bairro","Cidade","COMERCIAL - Contato","COMERCIAL - Telefone","COMERCIAL - E-mail"
@@ -101,7 +117,9 @@ while True:
         print(f"Erro ao acessar um índice: {e}")
 
 
-    #nessa parte o que eu faço é só organizar os dados filtrados do json para que fiquem na ordem em que preciso. Jogo essa organização dentro de dados_filtrados_reorganizado. O modelo de ficha que eu faço manualmente segue exatamente essa ordem. Tem o detalhe de conter a data do lado do numero do chamado, por isso a funcao datetime.date.today().
+    #nessa parte o que eu faço é só organizar os dados filtrados do json para que fiquem na ordem em que preciso.
+    #Jogo essa organização dentro de dados_filtrados_reorganizado. O modelo de ficha que eu faço manualmente segue
+    #exatamente essa ordem. Tem o detalhe de conter a data do lado do numero do chamado, por isso a funcao datetime.date.today().
     data = datetime.date.today()
     dados_filtrados_reorganizado = {
         "Chamado": str(dados_filtrados["Chamado"]) + " - " + str(data.strftime("%d/%m/%Y")),
@@ -125,7 +143,10 @@ while True:
         json.dump(dados_filtrados_reorganizado, file, ensure_ascii=False, indent=4) 
         
 
-    #essa função é a que cria a planilha excel. Não entendo nada dessa parte, só copiei e colei do gpt kkkkkkkkkkkkk. Mas assim, eu queria manter o mesmo estilo da planilha que eu fazia. Então eu printei a planilha e joguei no gpt, pedindo para ele me dar um código base que me desse um resultado muito parecido. Depois disso eu só fui alterando alguns detalhes até chegar no resultado que eu queria. A lib que eu usei pra fazer essa manipulação de é a openpyxl.
+    #essa função é a que cria a planilha excel. Não entendo nada dessa parte, só copiei e colei do gpt kkkkkkkkkkkkk.
+    #Mas assim, eu queria manter o mesmo estilo da planilha que eu fazia. Então eu printei a planilha e joguei no gpt,
+    #pedindo para ele me dar um código base que me desse um resultado muito parecido. Depois disso eu só fui alterando
+    #alguns detalhes até chegar no resultado que eu queria. A lib que eu usei pra fazer essa manipulação de é a openpyxl.
     def gerar_planilha_estilizada(dados, arquivo_excel, caminho_imagem):
         wb = Workbook()
         ws = wb.active
@@ -196,13 +217,18 @@ while True:
         wb.save(arquivo_excel)
         print(f"\nPlanilha salva em: {arquivo_excel}")
 
-    #aqui é como eu salvo a planilha. Primeiro eu defini o caminho raiz, que é a pasta compartilhada que a empresa usa no drive pra salvar as fichas. Aí dentro tem pastas de a até z, e dentro de cada uma delas tem pastas nomeadas com as razões sociais dos clientes. Meu código vai verificar no caminho raiz se existe pasta com a letra inicial da razão social do cliente que estamos gerando a ficha, se houver, ele entra na pasta, se nao, ele cria ela e continua. Depois ele verifica se existe a pasta com o nome da razão social do cliente, se houver, ele entra, se não, ele cria. Por fim ele cria a planilha dentro dessa pasta.
+    #aqui é como eu salvo a planilha. Primeiro eu defini o caminho raiz, que é a pasta compartilhada que a empresa usa no
+    #drive pra salvar as fichas (Tive que usar o Drive Desktop). Aí dentro tem pastas de a até z, e dentro de cada uma
+    #delas tem pastas nomeadas com as razões sociais dos clientes. Meu código vai verificar no caminho raiz se existe
+    #pasta com a letra inicial da razão social do cliente que estamos gerando a ficha, se houver, ele entra na pasta, se nao,
+    #ele cria ela e continua. Depois ele verifica se existe a pasta com o nome da razão social do cliente, se houver, ele entra,
+    #se não, ele cria. Por fim ele cria a planilha dentro dessa pasta.
     caminho_base = f"G:\\Drives compartilhados\\FICHAS DE IMPLANTACAO"
 
     primeira_letra = dados_filtrados["Razão Social"][0].upper()
     subpasta_letra = os.path.join(caminho_base, primeira_letra)
 
-    #cria a pasta da letra inicial da razão social do cliente
+    #cria a pasta da letra inicial da razao social do cliente
     tipo_mensagem_letra = "já existia" if os.path.exists(subpasta_letra) else "foi criada"
     os.makedirs(subpasta_letra, exist_ok=True)
     print(f"\nPasta da letra '{primeira_letra}'{tipo_mensagem_letra}: {subpasta_letra}")
@@ -227,7 +253,8 @@ while True:
     #aí finalmente eu chamo a função que cria a planilha.
     gerar_planilha_estilizada(dados_filtrados_reorganizado, arquivo_excel, caminho_imagem)
 
-    #isso aqui mantem o programa rodando por 3 seg e depois inicia o laço lá de cima de novo. Aí ele apaga os arquivos gerados no processo para nao ficar resíduo.
+    #isso aqui mantem o programa rodando por 3 seg e depois inicia o laço lá de cima de novo.
+    #Aí ele apaga os arquivos gerados no processo para nao ficar resíduo.
     time.sleep(3)
     os.remove('teste') 
     os.remove('arquivo.json')  

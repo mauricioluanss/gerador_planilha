@@ -126,7 +126,8 @@ while True:
         "Nome Fantasia": dados_filtrados["Nome Fantasia"],
         "Razão Social": dados_filtrados["Razão Social"],
         "CNPJ": dados_filtrados["CNPJ"],
-        "Endereco": dados_filtrados["Endereco"] + ", " + dados_filtrados["Numero"],
+        #"Endereco": dados_filtrados["Endereco"] + ", " + dados_filtrados["Numero"],
+        "Endereco": str(dados_filtrados["Endereco"] or "") + ", " + str(dados_filtrados["Numero"] or ""),
         "Bairro": dados_filtrados["Bairro"],
         "Cidade": dados_filtrados["Cidade"],
         "Contato": dados_filtrados["COMERCIAL - Contato"],
@@ -243,19 +244,13 @@ while True:
     arquivo_excel = os.path.join(pasta_razao_social, f"{dados_filtrados['Loja']}.xlsx")
 
     #essa parte faz um get na url onde está hospedada o logo da empresa que eu coloco dentro da planilha.
-    url_imagem = os.getenv("URL_IMAGEM")
-    url_img= f"{url_imagem}"
-    resposta = requests.get(url_img)
-    caminho_imagem = 'payer.png'
-    with open(caminho_imagem, 'wb') as f:
-        f.write(resposta.content)
-        
+    caminho_imagem = f"G:\\Drives compartilhados\\FICHAS DE IMPLANTACAO\\payer.png"
     #aí finalmente eu chamo a função que cria a planilha.
     gerar_planilha_estilizada(dados_filtrados_reorganizado, arquivo_excel, caminho_imagem)
+    os.startfile(pasta_razao_social)
 
     #isso aqui mantem o programa rodando por 3 seg e depois inicia o laço lá de cima de novo.
     #Aí ele apaga os arquivos gerados no processo para nao ficar resíduo.
-    time.sleep(3)
+    time.sleep(1)
     os.remove('teste') 
-    os.remove('arquivo.json')  
-    os.remove(caminho_imagem)
+    os.remove('arquivo.json') 

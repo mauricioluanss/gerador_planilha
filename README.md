@@ -18,7 +18,7 @@ Criei esse script pois uma das minhas atribuições como Analista de Suporte Jun
   - Google Drive (armazenamento das fichas).
   - TomTicket API (fonte dos dados).
  
-- ** Ver `requiriments.txt` para instalação das dependências.**
+- ** Ver `requirements.txt` para instalação das dependências.**
 
 ## Progama executando:
 ![GIF de exemplo](gif.gif)
